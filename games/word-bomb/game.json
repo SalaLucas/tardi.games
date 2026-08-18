@@ -1,0 +1,8 @@
+{
+  "title": "Bomba de Palavras",
+  "description": "Encontre uma palavra em português antes da bomba explodir.",
+  "players": {
+    "min": 2,
+    "max": 8
+  }
+}

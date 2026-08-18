@@ -1,0 +1,16 @@
+{
+  "name": "tardi-game-count-the-chaos",
+  "version": "0.0.0",
+  "description": "A fast multiplayer attention and counting game.",
+  "private": true,
+  "scripts": {
+    "build": "tardi-build",
+    "dev": "tardi-build dev"
+  },
+  "dependencies": {
+    "@tardi/sdk": "*"
+  },
+  "devDependencies": {
+    "@tardi/build": "*"
+  }
+}

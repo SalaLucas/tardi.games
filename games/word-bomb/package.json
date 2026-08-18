@@ -1,0 +1,17 @@
+{
+  "name": "tardi-game-word-bomb",
+  "version": "1.0.0",
+  "description": "Um jogo multiplayer de palavras em português.",
+  "private": true,
+  "scripts": {
+    "prepare-words": "node scripts/prepare-words.js",
+    "build": "tardi-build",
+    "dev": "tardi-build dev"
+  },
+  "dependencies": {
+    "@juxhouse/tardi-core": "0.1.2"
+  },
+  "devDependencies": {
+    "@juxhouse/tardi-build": "0.1.3"
+  }
+}

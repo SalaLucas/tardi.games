@@ -1,0 +1,8 @@
+{
+  "title": "Count the Chaos",
+  "description": "Watch the moving objects, then count the one you were shown.",
+  "players": {
+    "min": 1,
+    "max": 8
+  }
+}
