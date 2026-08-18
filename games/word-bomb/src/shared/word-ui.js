@@ -14,10 +14,16 @@ var CSS = [
 export function mountTable(root) {
   injectStyle()
   var wrap = el('div', 'wb-table'), top = el('div', 'wb-top'), main = el('div', 'wb-main'), roster = el('div', 'wb-roster')
+  var deadline = 0
   top.appendChild(el('div', 'wb-title', 'Bomba de Palavras'))
   top.appendChild(el('div', 'wb-round'))
   wrap.appendChild(top); wrap.appendChild(el('div', 'wb-bomb')); wrap.appendChild(main); wrap.appendChild(roster); root.appendChild(wrap)
+  setInterval(function () {
+    var clock = wrap.querySelector('.wb-seconds')
+    if (clock && deadline) clock.textContent = String(secondsLeft(deadline))
+  }, 200)
   return function (state) {
+    deadline = state.deadline || 0
     var active = state.players && state.players[state.turnIndex]
     top.lastChild.textContent = state.phase === 'playing' ? '10 segundos · 3 vidas' : 'Português brasileiro'
     if (state.phase === 'lobby') main.innerHTML = '<div class="wb-caption">Desafio de palavras</div><div class="wb-pair">? ?</div><div class="wb-status">Cada jogador precisa encontrar uma palavra com as duas letras juntas.</div><div class="wb-help">Comece pelo celular quando todos estiverem prontos.</div>'
@@ -37,24 +43,50 @@ export function mountTable(root) {
 }
 
 export function mountHand(root, onAction) {
-  injectStyle(); var wrap = el('div', 'wb-hand'); root.appendChild(wrap)
+  injectStyle(); var wrap = el('div', 'wb-hand'), draft = '', draftKey = '', lastRenderKey = '', inputLocked = false
+  var deadline = 0
+  root.appendChild(wrap)
+  setInterval(function () {
+    var timer = wrap.querySelector('.timer')
+    if (timer && deadline) timer.textContent = secondsLeft(deadline) + 's'
+  }, 200)
   return function (state, playerId) {
     if (!state) { wrap.innerHTML = '<h1>Bomba de Palavras</h1><p>Conectando à mesa…</p>'; return }
+    deadline = state.deadline || 0
+    var stillMyTurn = state.phase === 'playing' && state.players[state.turnIndex].playerId === playerId
+    // Once typing begins, the input owns the screen until this player's turn
+    // ends. Network retries can then never replace the focused element.
+    if (inputLocked && stillMyTurn) return
+    if (!stillMyTurn) inputLocked = false
+    // Capture the actual DOM value as well as input events. This also covers
+    // mobile keyboards that dispatch their final input event during a repaint.
+    var openInput = wrap.querySelector('.wb-input')
+    if (openInput) draft = openInput.value
+    // Timer updates (and duplicate delivery acknowledgements) must not rebuild
+    // the input. Rebuilding a focused input discards what the player is typing.
+    var renderKey = [state.phase, state.pair, state.turnIndex, state.message, state.winnerId, state.lives[playerId]].join('|')
+    if (renderKey === lastRenderKey) return
+    lastRenderKey = renderKey
+    var turnKey = state.phase + ':' + state.pair + ':' + state.turnIndex + ':' + playerId
+    if (turnKey !== draftKey) { draft = ''; draftKey = turnKey }
     var me = findPlayer(state, playerId), myLives = state.lives[playerId] || 0
     if (state.phase === 'lobby') { wrap.innerHTML = '<h1>Bomba de Palavras</h1><p>Encontre uma palavra que contenha as duas letras sorteadas.</p><p>Você tem 10 segundos e 3 vidas.</p><button class="wb-button">Começar partida</button>'; wrap.querySelector('button').onclick = function () { onAction({ type: 'start' }) }; return }
     if (state.phase === 'finished') { wrap.innerHTML = '<h1>Fim de jogo</h1><p class="wb-winner">' + (state.winnerId === playerId ? 'Você venceu!' : escape(playerName(state, state.winnerId)) + ' venceu!') + '</p><button class="wb-button">Jogar novamente</button>'; wrap.querySelector('button').onclick = function () { onAction({ type: 'restart' }) }; return }
     var myTurn = state.players[state.turnIndex].playerId === playerId
     if (!myTurn) { wrap.innerHTML = '<h1>Acompanhe a mesa</h1><div class="pair">' + state.pair.toUpperCase() + '</div><p>É a vez de ' + escape(state.players[state.turnIndex].nick || 'outro jogador') + '.</p><div class="wb-lives">' + lifeMarkup(myLives) + '</div><p class="timer">' + state.secondsLeft + 's</p>'; return }
     if (myLives === 0) { wrap.innerHTML = '<h1>Você saiu da rodada</h1><p>Torça pelos demais jogadores.</p>'; return }
-    renderInput(wrap, state, onAction, myLives)
+    renderInput(wrap, state, onAction, myLives, draft, function (value) { draft = value; inputLocked = value !== '' }, function () { inputLocked = false }, function () { inputLocked = true })
   }
 }
 
-function renderInput(wrap, state, onAction, lives) {
+function renderInput(wrap, state, onAction, lives, draft, onDraft, onSend, onFocus) {
   wrap.innerHTML = '<p>É a sua vez!</p><div class="pair">' + state.pair.toUpperCase() + '</div><p class="timer">' + state.secondsLeft + 's</p><div class="wb-lives">' + lifeMarkup(lives) + '</div><input class="wb-input" maxlength="18" autocomplete="off" autocapitalize="none" placeholder="Digite uma palavra"><button class="wb-button">Enviar palavra</button><p class="wb-note">' + escape(state.message || '') + '</p>'
   var input = wrap.querySelector('input'), button = wrap.querySelector('button')
-  function send() { if (input.value.trim()) onAction({ type: 'word', word: input.value.trim() }) }
+  input.value = draft
+  function send() { var word = input.value.trim(); if (word) { onDraft(''); onSend(); onAction({ type: 'word', word: word }) } }
   button.onclick = send
+  input.oninput = function () { onDraft(input.value) }
+  input.onfocus = onFocus
   input.onkeydown = function (event) { if (event.key === 'Enter') send() }
   input.focus()
 }
@@ -62,6 +94,7 @@ function hearts(lives) { return '♥'.repeat(lives) + '♡'.repeat(3 - lives) }
 function lifeMarkup(lives) { var result = '', i; for (i = 0; i < 3; i++) result += '<span class="' + (i < lives ? 'on' : '') + '">♥</span>'; return result }
 function findPlayer(state, id) { return (state.players || []).filter(function (player) { return player.playerId === id })[0] }
 function playerName(state, id) { var player = findPlayer(state, id); return player ? (player.nick || 'Jogador') : 'Ninguém' }
+function secondsLeft(deadline) { return Math.max(0, Math.ceil((deadline - Date.now()) / 1000)) }
 function el(tag, className, text) { var node = document.createElement(tag); node.className = className || ''; if (text !== undefined) node.textContent = text; return node }
 function escape(value) { var node = document.createElement('div'); node.textContent = value || ''; return node.innerHTML }
 function injectStyle() { if (document.getElementById(STYLE_ID)) return; var style = document.createElement('style'); style.id = STYLE_ID; style.textContent = CSS; document.head.appendChild(style) }

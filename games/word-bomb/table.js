@@ -5913,6 +5913,7 @@ function mountTable(root) {
     top = el('div', 'wb-top'),
     main = el('div', 'wb-main'),
     roster = el('div', 'wb-roster');
+  var deadline = 0;
   top.appendChild(el('div', 'wb-title', 'Bomba de Palavras'));
   top.appendChild(el('div', 'wb-round'));
   wrap.appendChild(top);
@@ -5920,7 +5921,12 @@ function mountTable(root) {
   wrap.appendChild(main);
   wrap.appendChild(roster);
   root.appendChild(wrap);
+  setInterval(function () {
+    var clock = wrap.querySelector('.wb-seconds');
+    if (clock && deadline) clock.textContent = String(secondsLeft(deadline));
+  }, 200);
   return function (state) {
+    deadline = state.deadline || 0;
     var active = state.players && state.players[state.turnIndex];
     top.lastChild.textContent = state.phase === 'playing' ? '10 segundos · 3 vidas' : 'Português brasileiro';
     if (state.phase === 'lobby') main.innerHTML = '<div class="wb-caption">Desafio de palavras</div><div class="wb-pair">? ?</div><div class="wb-status">Cada jogador precisa encontrar uma palavra com as duas letras juntas.</div><div class="wb-help">Comece pelo celular quando todos estiverem prontos.</div>';else if (state.phase === 'playing') main.innerHTML = '<div class="wb-caption">Vez de ' + word_ui_escape(active.nick || 'Jogador') + '</div><div class="wb-pair">' + state.pair.toUpperCase() + '</div><div class="wb-status">' + word_ui_escape(state.message || 'Encontre uma palavra antes da bomba explodir.') + '</div><div class="wb-help">As letras precisam aparecer juntas, nessa ordem.</div>';else main.innerHTML = '<div class="wb-caption">A bomba parou</div><div class="wb-pair">★</div><div class="wb-status">' + (state.winnerId ? word_ui_escape(playerName(state, state.winnerId)) + ' venceu!' : 'Partida encerrada.') + '</div><div class="wb-help">Uma nova partida pode ser iniciada pelo celular.</div>';
@@ -5939,12 +5945,41 @@ function mountTable(root) {
 }
 function mountHand(root, onAction) {
   injectStyle();
-  var wrap = el('div', 'wb-hand');
+  var wrap = el('div', 'wb-hand'),
+    draft = '',
+    draftKey = '',
+    lastRenderKey = '',
+    inputLocked = false;
+  var deadline = 0;
   root.appendChild(wrap);
+  setInterval(function () {
+    var timer = wrap.querySelector('.timer');
+    if (timer && deadline) timer.textContent = secondsLeft(deadline) + 's';
+  }, 200);
   return function (state, playerId) {
     if (!state) {
       wrap.innerHTML = '<h1>Bomba de Palavras</h1><p>Conectando à mesa…</p>';
       return;
+    }
+    deadline = state.deadline || 0;
+    var stillMyTurn = state.phase === 'playing' && state.players[state.turnIndex].playerId === playerId;
+    // Once typing begins, the input owns the screen until this player's turn
+    // ends. Network retries can then never replace the focused element.
+    if (inputLocked && stillMyTurn) return;
+    if (!stillMyTurn) inputLocked = false;
+    // Capture the actual DOM value as well as input events. This also covers
+    // mobile keyboards that dispatch their final input event during a repaint.
+    var openInput = wrap.querySelector('.wb-input');
+    if (openInput) draft = openInput.value;
+    // Timer updates (and duplicate delivery acknowledgements) must not rebuild
+    // the input. Rebuilding a focused input discards what the player is typing.
+    var renderKey = [state.phase, state.pair, state.turnIndex, state.message, state.winnerId, state.lives[playerId]].join('|');
+    if (renderKey === lastRenderKey) return;
+    lastRenderKey = renderKey;
+    var turnKey = state.phase + ':' + state.pair + ':' + state.turnIndex + ':' + playerId;
+    if (turnKey !== draftKey) {
+      draft = '';
+      draftKey = turnKey;
     }
     var me = findPlayer(state, playerId),
       myLives = state.lives[playerId] || 0;
@@ -5975,20 +6010,37 @@ function mountHand(root, onAction) {
       wrap.innerHTML = '<h1>Você saiu da rodada</h1><p>Torça pelos demais jogadores.</p>';
       return;
     }
-    renderInput(wrap, state, onAction, myLives);
+    renderInput(wrap, state, onAction, myLives, draft, function (value) {
+      draft = value;
+      inputLocked = value !== '';
+    }, function () {
+      inputLocked = false;
+    }, function () {
+      inputLocked = true;
+    });
   };
 }
-function renderInput(wrap, state, onAction, lives) {
+function renderInput(wrap, state, onAction, lives, draft, onDraft, onSend, onFocus) {
   wrap.innerHTML = '<p>É a sua vez!</p><div class="pair">' + state.pair.toUpperCase() + '</div><p class="timer">' + state.secondsLeft + 's</p><div class="wb-lives">' + lifeMarkup(lives) + '</div><input class="wb-input" maxlength="18" autocomplete="off" autocapitalize="none" placeholder="Digite uma palavra"><button class="wb-button">Enviar palavra</button><p class="wb-note">' + word_ui_escape(state.message || '') + '</p>';
   var input = wrap.querySelector('input'),
     button = wrap.querySelector('button');
+  input.value = draft;
   function send() {
-    if (input.value.trim()) onAction({
-      type: 'word',
-      word: input.value.trim()
-    });
+    var word = input.value.trim();
+    if (word) {
+      onDraft('');
+      onSend();
+      onAction({
+        type: 'word',
+        word: word
+      });
+    }
   }
   button.onclick = send;
+  input.oninput = function () {
+    onDraft(input.value);
+  };
+  input.onfocus = onFocus;
   input.onkeydown = function (event) {
     if (event.key === 'Enter') send();
   };
@@ -6011,6 +6063,9 @@ function findPlayer(state, id) {
 function playerName(state, id) {
   var player = findPlayer(state, id);
   return player ? player.nick || 'Jogador' : 'Ninguém';
+}
+function secondsLeft(deadline) {
+  return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
 }
 function el(tag, className, text) {
   var node = document.createElement(tag);
@@ -6045,7 +6100,6 @@ var players = [];
 var state = initialState();
 var update = mountTable(document.body);
 var timeout = null;
-var ticker = null;
 startMatch({
   onMessage: onMessage,
   onPlayersChange: onPlayersChange
@@ -6104,8 +6158,6 @@ function beginTurn(message) {
   timeout = setTimeout(function () {
     loseLife('Tempo esgotado!');
   }, 10020);
-  clearInterval(ticker);
-  ticker = setInterval(publish, 250);
 }
 function submitWord(playerId, rawWord) {
   var word = normalizeWord(rawWord);
@@ -6183,9 +6235,7 @@ function playerById(id) {
 }
 function clearTimers() {
   clearTimeout(timeout);
-  clearInterval(ticker);
   timeout = null;
-  ticker = null;
 }
 function publish() {
   state.players = players;

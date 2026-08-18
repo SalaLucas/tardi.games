@@ -6,7 +6,6 @@ var players = []
 var state = initialState()
 var update = mountTable(document.body)
 var timeout = null
-var ticker = null
 
 startMatch({ onMessage: onMessage, onPlayersChange: onPlayersChange })
 // Show the lobby immediately. The development harness sends its player list
@@ -49,8 +48,6 @@ function beginTurn(message) {
   state.deadline = Date.now() + 10000
   publish()
   timeout = setTimeout(function () { loseLife('Tempo esgotado!') }, 10020)
-  clearInterval(ticker)
-  ticker = setInterval(publish, 250)
 }
 
 function submitWord(playerId, rawWord) {
@@ -90,5 +87,5 @@ function alivePlayers() { return players.filter(function (player) { return state
 function currentPlayerId() { return players[state.turnIndex] && players[state.turnIndex].playerId }
 function nextAliveIndex(currentId) { var start = 0, i; for (i = 0; i < players.length; i++) if (players[i].playerId === currentId) start = i; for (i = 1; i <= players.length; i++) { var index = (start + i) % players.length; if (state.lives[players[index].playerId] > 0) return index } return start }
 function playerById(id) { return players.filter(function (player) { return player.playerId === id })[0] }
-function clearTimers() { clearTimeout(timeout); clearInterval(ticker); timeout = null; ticker = null }
+function clearTimers() { clearTimeout(timeout); timeout = null }
 function publish() { state.players = players; state.secondsLeft = state.deadline ? Math.max(0, Math.ceil((state.deadline - Date.now()) / 1000)) : null; update(state); sendToAllHands(state) }
