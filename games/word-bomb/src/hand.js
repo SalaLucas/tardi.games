@@ -18,5 +18,6 @@ function action(message) {
   if (!state) return
   if (message.type === 'start' && state.phase === 'lobby') sendToTable({ start: true })
   if (message.type === 'restart' && state.phase === 'finished') sendToTable({ restart: true })
+  if (message.type === 'typing' && state.phase === 'playing' && state.players[state.turnIndex].playerId === playerId) sendToTable({ typing: message.word })
   if (message.type === 'word' && state.phase === 'playing' && state.players[state.turnIndex].playerId === playerId) sendToTable({ word: message.word })
 }

@@ -472,7 +472,7 @@ var $TypeError = TypeError;
 var MAX_SAFE_INTEGER = 0x1FFFFFFFFFFFFF; // 2 ** 53 - 1 == 9007199254740991
 
 module.exports = function (it) {
-  if (it > MAX_SAFE_INTEGER) throw $TypeError('Maximum allowed index exceeded');
+  if (it > MAX_SAFE_INTEGER) throw new $TypeError('Maximum allowed index exceeded');
   return it;
 };
 
@@ -668,7 +668,7 @@ var fails = __webpack_require__(9039);
 
 module.exports = !fails(function () {
   // eslint-disable-next-line es/no-function-prototype-bind -- safe
-  var test = (function () { /* empty */ }).bind();
+  var test = function () { /* empty */ }.bind();
   // eslint-disable-next-line no-prototype-builtins -- safe
   return typeof test != 'function' || test.hasOwnProperty('prototype');
 });
@@ -704,7 +704,7 @@ var getDescriptor = DESCRIPTORS && Object.getOwnPropertyDescriptor;
 
 var EXISTS = hasOwn(FunctionPrototype, 'name');
 // additional protection from minified / mangled / dropped function names
-var PROPER = EXISTS && (function something() { /* empty */ }).name === 'something';
+var PROPER = EXISTS && function something() { /* empty */ }.name === 'something';
 var CONFIGURABLE = EXISTS && (!DESCRIPTORS || (DESCRIPTORS && getDescriptor(FunctionPrototype, 'name').configurable));
 
 module.exports = {
@@ -1603,10 +1603,10 @@ var SHARED = '__core-js_shared__';
 var store = module.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
 (store.versions || (store.versions = [])).push({
-  version: '3.46.0',
+  version: '3.50.0',
   mode: IS_PURE ? 'pure' : 'global',
-  copyright: '© 2014-2025 Denis Pushkarev (zloirock.ru), 2025 CoreJS Company (core-js.io)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.46.0/LICENSE',
+  copyright: '© 2013–2025 Denis Pushkarev (zloirock.ru), 2025–2026 CoreJS Company (core-js.io). All rights reserved.',
+  license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -1618,9 +1618,11 @@ var store = module.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, 
 
 
 var store = __webpack_require__(7629);
+// eslint-disable-next-line es/no-object-create -- safe
+var create = Object.create || Object;
 
 module.exports = function (key, value) {
-  return store[key] || (store[key] = value || {});
+  return store[key] || (store[key] = value || create(null));
 };
 
 
@@ -1848,7 +1850,7 @@ var wellKnownSymbol = __webpack_require__(8227);
 
 var TO_STRING_TAG = wellKnownSymbol('toStringTag');
 var test = {};
-
+// eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
 test[TO_STRING_TAG] = 'z';
 
 module.exports = String(test) === '[object z]';
@@ -2052,6 +2054,7 @@ var toAbsoluteIndex = __webpack_require__(5610);
 var lengthOfArrayLike = __webpack_require__(6198);
 var toIndexedObject = __webpack_require__(5397);
 var createProperty = __webpack_require__(4659);
+var setArrayLength = __webpack_require__(4527);
 var wellKnownSymbol = __webpack_require__(8227);
 var arrayMethodHasSpeciesSupport = __webpack_require__(597);
 var nativeSlice = __webpack_require__(7680);
@@ -2088,7 +2091,7 @@ $({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT }, {
     }
     result = new (Constructor === undefined ? $Array : Constructor)(max(fin - k, 0));
     for (n = 0; k < fin; k++, n++) if (k in O) createProperty(result, n, O[k]);
-    result.length = n;
+    setArrayLength(result, n);
     return result;
   }
 });
@@ -2172,7 +2175,9 @@ var getSortCompare = function (comparefn) {
     if (y === undefined) return -1;
     if (x === undefined) return 1;
     if (comparefn !== undefined) return +comparefn(x, y) || 0;
-    return toString(x) > toString(y) ? 1 : -1;
+    var xString = toString(x);
+    var yString = toString(y);
+    return xString === yString ? 0 : xString > yString ? 1 : -1;
   };
 };
 
@@ -2377,13 +2382,10 @@ var __webpack_exports__ = {};
 var es_array_slice = __webpack_require__(4782);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.number.constructor.js
 var es_number_constructor = __webpack_require__(2892);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.push.js
-var es_array_push = __webpack_require__(4114);
-;// ./node_modules/@tardi/sdk/hand.js
-
+;// ./node_modules/@juxhouse/tardi-core/hand.js
 // TardiHand SDK. A game's hand.js imports these and the build bundles them in:
 //
-//   import { joinMatch, sendToTable } from '@tardi/sdk/hand'
+//   import { joinMatch, sendToTable } from '@juxhouse/tardi-core/hand'
 //
 // TardiHand <-> Hand host message protocol:
 //
@@ -2412,67 +2414,80 @@ var es_array_push = __webpack_require__(4114);
 // - A Table state is delivered to the game only when there are no queued Hand
 //   messages waiting to be incorporated by the Table.
 
-var RETRY_MS = 500;
-var onStateChangeHandler = null;
-var messagesToSend = [];
-var nextMessageSeq = -1; // -1 means we dont know yet. We might be a reloaded hand
-// and the previous incarnation might have already sent messages.
-// So initially we send acks wait for some tableState so we can sync this seq.
+var RETRY_MS = 500
 
-var highestMatchVersion = 0;
+var onStateChangeHandler = null
+
+var messagesToSend = []
+var nextMessageSeq = -1  // -1 means we dont know yet. We might be a reloaded hand
+                         // and the previous incarnation might have already sent messages.
+                         // So initially we send acks wait for some tableState so we can sync this seq.
+
+var highestMatchVersion = 0
+
 function joinMatch(options) {
   if (onStateChangeHandler) {
-    throw "joinMatch was called more than once";
+    throw "joinMatch was called more than once"
   }
-  onStateChangeHandler = options.onStateChange;
+  onStateChangeHandler = options.onStateChange
   if (!onStateChangeHandler) {
-    throw "joinMatch must receive {onStateChange: <some-function>}";
+    throw "joinMatch must receive {onStateChange: <some-function>}"
   }
-  window.addEventListener('message', handleMessage);
+  window.addEventListener('message', handleMessage)
+
   setInterval(transmitIfNecessary, RETRY_MS);
 }
+
 function sendToTable(message) {
   if (nextMessageSeq === -1) {
     return;
   }
-  messagesToSend.push(message);
-  transmitIfNecessary();
+  messagesToSend.push(message)
+  transmitIfNecessary()
 }
+
 function handleMessage(event) {
-  var envelope = event.data || {};
+  var envelope = event.data || {}
+
   if (envelope.intent !== 'tardi.table.sendGameStateToHand') {
-    return;
+    return
   }
-  var handSeq = envelope.handSeq;
-  handleAck(handSeq);
+
+  var handSeq = envelope.handSeq
+
+  handleAck(handSeq)
+
   if (messagesToSend.length === 0 && envelope.matchVersion > highestMatchVersion) {
-    highestMatchVersion = envelope.matchVersion;
-    notifyGame(envelope.playerId, envelope.players, envelope.messageFromTable);
-    ackTableState();
+    highestMatchVersion = envelope.matchVersion
+    notifyGame(envelope.playerId, envelope.players, envelope.messageFromTable)
+    ackTableState()
   }
+
 }
+
 function handleAck(ackedSeq) {
   if (ackedSeq > nextMessageSeq) {
-    messagesToSend = []; // For the case of weird concurrent Hand sessions in different tabs.
-    nextMessageSeq = ackedSeq + 1;
-    return;
+    messagesToSend = []              // For the case of weird concurrent Hand sessions in different tabs.
+    nextMessageSeq = ackedSeq + 1
+    return
   }
-  if (ackedSeq < nextMessageSeq) {
-    // Old ack.
-    return;
+
+  if (ackedSeq < nextMessageSeq) {  // Old ack.
+    return
   }
 
   // ackedSeq is equal to nextMessageSeq
-  messagesToSend.shift();
-  nextMessageSeq += 1;
-  transmitIfNecessary();
+  messagesToSend.shift()
+  nextMessageSeq += 1
+  transmitIfNecessary()
 }
+
 function notifyGame(playerId, players, messageFromTable) {
   onStateChangeHandler({
     playerId: playerId,
     players: players,
-    messageFromTable: messageFromTable
-  });
+    messageFromTable: messageFromTable,
+  })
 }
 
 // Tell the Table the latest version this Hand has accepted. Doubles as the
@@ -2480,22 +2495,27 @@ function notifyGame(playerId, players, messageFromTable) {
 function ackTableState() {
   window.parent.postMessage({
     intent: 'tardi.hand.ackTableState',
-    matchVersion: highestMatchVersion
-  }, '*');
+    matchVersion: highestMatchVersion,
+  }, '*')
 }
+
 function transmitIfNecessary() {
   if (messagesToSend.length === 0) {
-    return;
+    return
   }
-  sendMessageToTable(messagesToSend[0]);
+  sendMessageToTable(messagesToSend[0])
 }
+
 function sendMessageToTable(msg) {
   window.parent.postMessage({
     intent: 'tardi.hand.sendMessageToTable',
     handSeq: nextMessageSeq,
-    messageFromHand: msg
-  }, '*');
+    messageFromHand: msg,
+  }, '*')
 }
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.push.js
+var es_array_push = __webpack_require__(4114);
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.sort.js
 var es_array_sort = __webpack_require__(6910);
 ;// ./src/shared/attention-ui.js

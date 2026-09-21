@@ -1,4 +1,4 @@
-import { joinMatch, sendToTable } from '@tardi/sdk/hand'
+import { joinMatch, sendToTable } from '@juxhouse/tardi-core/hand'
 import { mountHand } from './shared/attention-ui.js'
 
 var state = null, playerId = null, answer = ''

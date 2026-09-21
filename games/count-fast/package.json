@@ -8,9 +8,9 @@
     "dev": "tardi-build dev"
   },
   "dependencies": {
-    "@tardi/sdk": "*"
+    "@juxhouse/tardi-core": "0.1.2"
   },
   "devDependencies": {
-    "@tardi/build": "*"
+    "@juxhouse/tardi-build": "0.1.3"
   }
 }

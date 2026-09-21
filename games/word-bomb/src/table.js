@@ -13,7 +13,7 @@ startMatch({ onMessage: onMessage, onPlayersChange: onPlayersChange })
 // that handshake is still in flight.
 publish()
 
-function initialState() { return { phase: 'lobby', lives: {}, turnIndex: 0, pair: '', usedWords: [], message: '' } }
+function initialState() { return { phase: 'lobby', lives: {}, turnIndex: 0, pair: '', usedWords: [], message: '', typedWord: '', acceptedWord: '' } }
 
 function onPlayersChange(info) {
   players = info.players
@@ -27,7 +27,9 @@ function onMessage(envelope) {
   if (!playerById(envelope.playerId)) return
   if (state.phase === 'lobby' && message.start) { startGame(); return }
   if (state.phase === 'finished' && message.restart) { clearTimers(); state = initialState(); syncLives(); publish(); return }
-  if (state.phase !== 'playing' || currentPlayerId() !== envelope.playerId || !message.word) return
+  if (state.phase !== 'playing' || currentPlayerId() !== envelope.playerId || state.acceptedWord) return
+  if (message.typing !== undefined) { updateTyping(message.typing); return }
+  if (!message.word) return
   submitWord(envelope.playerId, message.word)
 }
 
@@ -38,16 +40,23 @@ function startGame() {
   syncLives()
   state.phase = 'playing'
   state.turnIndex = 0
-  beginTurn('')
+  beginTurn('', true)
 }
 
-function beginTurn(message) {
+function beginTurn(message, changePair) {
   clearTimeout(timeout)
-  state.pair = nextPair()
+  if (changePair || !state.pair) state.pair = nextPair()
   state.message = message
+  state.typedWord = ''
+  state.acceptedWord = ''
   state.deadline = Date.now() + 10000
   publish()
   timeout = setTimeout(function () { loseLife('Tempo esgotado!') }, 10020)
+}
+
+function updateTyping(value) {
+  state.typedWord = String(value || '').slice(0, 18)
+  publish()
 }
 
 function submitWord(playerId, rawWord) {
@@ -56,7 +65,14 @@ function submitWord(playerId, rawWord) {
   if (!isValidWord(word)) { state.message = 'Essa palavra não está no dicionário.'; publish(); return }
   if (state.usedWords.indexOf(word) !== -1) { state.message = 'Essa palavra já foi usada.'; publish(); return }
   state.usedWords.push(word)
-  advanceTurn((playerById(playerId).nick || 'Jogador') + ' encontrou “' + rawWord.trim() + '”!')
+  var playerName = playerById(playerId).nick || 'Jogador'
+  state.typedWord = String(rawWord).trim().slice(0, 18)
+  state.acceptedWord = state.typedWord
+  state.message = playerName + ' acertou!'
+  state.deadline = null
+  clearTimeout(timeout)
+  publish()
+  timeout = setTimeout(function () { advanceTurn(playerName + ' encontrou “' + state.acceptedWord + '”!', false) }, 1500)
 }
 
 function loseLife(message) {
@@ -64,13 +80,13 @@ function loseLife(message) {
   var id = currentPlayerId()
   state.lives[id] = Math.max(0, state.lives[id] - 1)
   if (alivePlayers().length <= 1) { finishGame(message); return }
-  advanceTurn((playerById(id).nick || 'Jogador') + ' perdeu uma vida — ' + message)
+  advanceTurn((playerById(id).nick || 'Jogador') + ' perdeu uma vida — ' + message, true)
 }
 
-function advanceTurn(message) {
+function advanceTurn(message, changePair) {
   var current = currentPlayerId(), next = nextAliveIndex(current)
   state.turnIndex = next
-  beginTurn(message)
+  beginTurn(message, changePair)
 }
 
 function finishGame(message) {

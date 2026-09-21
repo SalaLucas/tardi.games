@@ -4,7 +4,7 @@
 
 ```
 game.json               # Describes your game. See below
-package.json            # depends on @tardi/sdk and @tardi/build
+package.json            # depends on @juxhouse/tardi-core and @juxhouse/tardi-build
 assets/thumbnail.png    # 512x512 pixels.
 src/                    # Your game source files go here.
   table.js              # Your Table entry point (required)
@@ -28,7 +28,7 @@ The files required by Tardi will be generated:
 hand.js
 table.js
 ```
-Commit them to your `main` branch and push to Github. Every couple of minute, Tardi automatically detects commits to all public Github repos called `tardi.games` and releases them on https://tardi.games
+Commit the game sources to your `main` branch and push to GitHub. The repository workflow builds every game and creates a GitHub release. Tardi detects releases from public repositories named `tardi.games` and deploys them on https://tardi.games.
 
 
 #### game.json example
@@ -69,10 +69,10 @@ Import the SDK from your entry points (no globals are injected):
 
 ```js
 // src/table.js
-import { startMatch, sendToAllHands, endMatch } from '@tardi/sdk/table'
+import { startMatch, sendToAllHands, endMatch } from '@juxhouse/tardi-core/table'
 
 // src/hand.js
-import { joinMatch, sendToTable } from '@tardi/sdk/hand'
+import { joinMatch, sendToTable } from '@juxhouse/tardi-core/hand'
 ```
 
 Test locally with `npm run dev`: it serves one table and two hands wired

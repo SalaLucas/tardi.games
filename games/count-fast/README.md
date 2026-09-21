@@ -17,7 +17,7 @@ src/
     tic-tac-toe-rules.js  game rules (winner, draw) — used by table AND hand
     board.js              the responsive 3x3 board UI — used by table AND hand
 dev/index.html       local test harness (one table + two hands)
-hand.js, table.js    BUILD OUTPUTS (git-ignored) — produced by `npm run build`
+hand.js, table.js    BUILD OUTPUTS — produced by `npm run build`
 ```
 
 ## The SDK
@@ -26,10 +26,10 @@ Your game imports the SDK; nothing is injected globally.
 
 ```js
 // table.js
-import { startMatch, sendToAllHands, endMatch } from '@tardi/sdk/table'
+import { startMatch, sendToAllHands, endMatch } from '@juxhouse/tardi-core/table'
 
 // hand.js
-import { joinMatch, sendToTable } from '@tardi/sdk/hand'
+import { joinMatch, sendToTable } from '@juxhouse/tardi-core/hand'
 ```
 
 - The **table** calls `startMatch({ onMessage, onPlayersChange })`, broadcasts
@@ -67,4 +67,4 @@ play both hands, and watch the table.
 2. Replace `assets/thumbnail.png` (512x512).
 3. Rewrite `src/` for your game. Keep rules and UI that both sides need in
    `src/shared/`.
-4. `npm run build`, then publish the repo.
+4. Push to `main`; the repository workflow builds the game and publishes a release.

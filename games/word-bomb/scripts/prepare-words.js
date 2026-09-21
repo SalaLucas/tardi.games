@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 
 const root = path.join(__dirname, '..')
-const source = path.join(root, 'vendor', 'unitex-pt-br', 'data', 'mirror', 'DELAS.csv')
+const source = path.join(root, '..', '..', 'vendor', 'word-bomb', 'unitex-pt-br', 'data', 'mirror', 'DELAS.csv')
 const destination = path.join(root, 'src', 'data', 'words.js')
 const rows = fs.readFileSync(source, 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/)
 const words = new Set()
@@ -17,7 +17,7 @@ for (let i = 1; i < rows.length; i += 1) {
 
 const output = [
   '// Generated from datasets-br/unitex-pt-br (DELAS), LGPLLR.',
-  '// Run npm run prepare-words after updating vendor/unitex-pt-br.',
+  '// Run npm run prepare-words after updating ../../vendor/word-bomb/unitex-pt-br.',
   'export var WORDS = ' + JSON.stringify(Array.from(words).sort()) + '\n'
 ].join('\n')
 fs.mkdirSync(path.dirname(destination), { recursive: true })

@@ -3187,7 +3187,7 @@ var web_dom_collections_for_each = __webpack_require__(3500);
 
 
 var STYLE_ID = 'word-bomb-style';
-var CSS = ['*{box-sizing:border-box}', 'html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120b27;color:#fff7e8;font-family:Arial,sans-serif}', '.wb-table{min-height:100%;position:relative;overflow:hidden;padding:4vmin;background:radial-gradient(circle at 50% 42%,#44205f 0,#24113d 45%,#11091f 100%)}', '.wb-table:before{content:"";position:absolute;inset:-40%;opacity:.25;background:repeating-radial-gradient(circle,#ffb338 0 1px,transparent 2px 9vmin);transform:rotate(14deg)}', '.wb-top,.wb-main,.wb-roster{position:relative;z-index:1}.wb-top{display:flex;justify-content:space-between;align-items:center;color:#f7d58b;text-transform:uppercase;letter-spacing:.14em}.wb-title{font-size:3vmin;font-weight:bold}.wb-round{font-size:1.8vmin}', '.wb-main{height:66vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.wb-caption{font-size:2.3vmin;letter-spacing:.16em;text-transform:uppercase;color:#e8c6ff}.wb-pair{font-size:22vmin;line-height:.9;font-weight:bold;letter-spacing:.04em;color:#ffd166;text-shadow:0 .9vmin 0 #9b5119,0 1.8vmin 3vmin #0008}.wb-status{margin-top:4vmin;min-height:4vmin;max-width:72vmin;font-size:2.8vmin;font-weight:bold}.wb-help{font-size:2vmin;color:#e1cef2;margin-top:1vmin}', '.wb-bomb{width:11vmin;height:11vmin;border-radius:50%;background:radial-gradient(circle at 33% 28%,#ff837c 0 7%,#e63643 9%,#8d132c 68%);box-shadow:0 1vmin 2vmin #0008;position:absolute;right:6vmin;top:11vmin}.wb-bomb:after{content:"";position:absolute;width:6vmin;height:2vmin;border-top:.8vmin solid #ffca68;right:-4.5vmin;top:-2vmin;transform:rotate(-25deg);border-radius:50%}.wb-seconds{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:4.5vmin;font-weight:bold}', '.wb-roster{position:absolute;z-index:2;bottom:2.5vmin;left:3vmin;right:3vmin;display:flex;gap:1.2vmin;justify-content:center;flex-wrap:wrap}.wb-player{min-width:16vmin;padding:1.2vmin 1.8vmin;border-radius:1.8vmin;background:#170c2bdd;border:1px solid #765697;font-size:1.9vmin}.wb-player.active{background:#5b276a;border-color:#ffd166;box-shadow:0 0 2vmin #ffd16666}.wb-player.out{opacity:.42;filter:grayscale(1)}.wb-player b{display:block;font-size:2.2vmin}.wb-heart{color:#ff6978}', '.wb-hand{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7vmin 5vmin;background:radial-gradient(circle at 50% 25%,#512c72,#160b2a 72%);text-align:center}.wb-hand h1{margin:0 0 2vmin;font-size:8vmin}.wb-hand p{margin:1vmin 0;color:#e7d5f3;font-size:4vmin}.wb-hand .pair{font-size:26vmin;line-height:1;font-weight:bold;color:#ffd166;text-shadow:0 .8vmin 0 #9b5119}.wb-hand .timer{color:#ff8e8e;font-size:8vmin;font-weight:bold}.wb-input{width:92%;height:14vmin;margin:4vmin 0 2vmin;border:0;border-radius:3vmin;padding:0 4vmin;font-size:6vmin;text-align:center;background:#fff9ed;color:#2b153e;outline:3px solid #ffd166}.wb-button{width:92%;border:0;border-radius:3vmin;padding:4vmin;background:#ffbd39;color:#351229;font-size:5vmin;font-weight:bold;box-shadow:0 1vmin 0 #a55b18}.wb-button:active{transform:translateY(.6vmin);box-shadow:0 .4vmin 0 #a55b18}.wb-note{min-height:7vmin;color:#ffbebf;font-size:3.4vmin!important}.wb-lives{display:flex;gap:1vmin;margin:2vmin 0;font-size:7vmin}.wb-lives span{filter:grayscale(1);opacity:.35}.wb-lives span.on{filter:none;opacity:1}.wb-winner{font-size:9vmin!important;color:#ffd166!important;font-weight:bold}'].join('');
+var CSS = ['*{box-sizing:border-box}', 'html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120b27;color:#fff7e8;font-family:Arial,sans-serif}', '.wb-table{min-height:100%;position:relative;overflow:hidden;padding:4vmin;background:radial-gradient(circle at 50% 42%,#44205f 0,#24113d 45%,#11091f 100%)}', '.wb-top,.wb-main,.wb-roster{position:relative;z-index:1}.wb-top{display:flex;justify-content:space-between;align-items:center;color:#f7d58b;text-transform:uppercase;letter-spacing:.14em}.wb-title{font-size:3vmin;font-weight:bold}.wb-round{font-size:1.8vmin}', '.wb-main{height:66vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.wb-caption{font-size:2.3vmin;letter-spacing:.16em;text-transform:uppercase;color:#e8c6ff}.wb-pair{font-size:22vmin;line-height:.9;font-weight:bold;letter-spacing:.04em;color:#ffd166;text-shadow:0 .9vmin 0 #9b5119,0 1.8vmin 3vmin #0008}.wb-word{display:flex;align-items:center;justify-content:center;width:80vw;min-height:11vmin;margin-top:2vmin;padding:1vmin 3vmin;border:.35vmin solid #9f78c2;border-radius:2vmin;background:#12091fd9;box-shadow:inset 0 0 2vmin #0008,0 0 2vmin #9f78c233;font-size:8vmin;line-height:1.1;font-weight:bold;letter-spacing:.04em;word-break:break-word;color:#fff7e8}.wb-word.empty{border-style:dashed;color:#bda8cc;font-size:2.8vmin;font-weight:normal}.wb-word.correct{border-color:#8ff0a4;color:#8ff0a4;text-shadow:0 0 2vmin #38c76c88;box-shadow:inset 0 0 2vmin #0008,0 0 3vmin #38c76c55}.wb-status{margin-top:1.5vmin;min-height:4vmin;max-width:72vmin;font-size:2.8vmin;font-weight:bold}.wb-help{font-size:2vmin;color:#e1cef2;margin-top:1vmin}', '.wb-bomb{width:11vmin;height:11vmin;border-radius:50%;background:radial-gradient(circle at 33% 28%,#ff837c 0 7%,#e63643 9%,#8d132c 68%);box-shadow:0 1vmin 2vmin #0008;position:absolute;right:6vmin;top:11vmin}.wb-bomb:after{content:"";position:absolute;width:6vmin;height:2vmin;border-top:.8vmin solid #ffca68;right:-4.5vmin;top:-2vmin;transform:rotate(-25deg);border-radius:50%}.wb-seconds{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:4.5vmin;font-weight:bold}', '.wb-roster{position:absolute;z-index:2;bottom:2.5vmin;left:3vmin;right:3vmin;display:flex;gap:1.2vmin;justify-content:center;flex-wrap:wrap}.wb-player{min-width:16vmin;padding:1.2vmin 1.8vmin;border-radius:1.8vmin;background:#170c2bdd;border:1px solid #765697;font-size:1.9vmin}.wb-player.active{background:#5b276a;border-color:#ffd166;box-shadow:0 0 2vmin #ffd16666}.wb-player.out{opacity:.42;filter:grayscale(1)}.wb-player b{display:block;font-size:2.2vmin}.wb-heart{color:#ff6978}', '.wb-hand{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7vmin 5vmin;background:radial-gradient(circle at 50% 25%,#512c72,#160b2a 72%);text-align:center}.wb-hand h1{margin:0 0 2vmin;font-size:8vmin}.wb-hand p{margin:1vmin 0;color:#e7d5f3;font-size:4vmin}.wb-hand .pair{font-size:26vmin;line-height:1;font-weight:bold;color:#ffd166;text-shadow:0 .8vmin 0 #9b5119}.wb-hand .timer{color:#ff8e8e;font-size:8vmin;font-weight:bold}.wb-input{width:92%;height:14vmin;margin:4vmin 0 2vmin;border:0;border-radius:3vmin;padding:0 4vmin;font-size:6vmin;text-align:center;background:#fff9ed;color:#2b153e;outline:3px solid #ffd166}.wb-button{width:92%;border:0;border-radius:3vmin;padding:4vmin;background:#ffbd39;color:#351229;font-size:5vmin;font-weight:bold;box-shadow:0 1vmin 0 #a55b18}.wb-button:active{transform:translateY(.6vmin);box-shadow:0 .4vmin 0 #a55b18}.wb-note{min-height:7vmin;color:#ffbebf;font-size:3.4vmin!important}.wb-lives{display:flex;gap:1vmin;margin:2vmin 0;font-size:7vmin}.wb-lives span{filter:grayscale(1);opacity:.35}.wb-lives span.on{filter:none;opacity:1}.wb-winner{font-size:9vmin!important;color:#ffd166!important;font-weight:bold}'].join('');
 function mountTable(root) {
   injectStyle();
   var wrap = el('div', 'wb-table'),
@@ -3210,10 +3210,10 @@ function mountTable(root) {
     deadline = state.deadline || 0;
     var active = state.players && state.players[state.turnIndex];
     top.lastChild.textContent = state.phase === 'playing' ? '10 segundos · 3 vidas' : 'Português brasileiro';
-    if (state.phase === 'lobby') main.innerHTML = '<div class="wb-caption">Desafio de palavras</div><div class="wb-pair">? ?</div><div class="wb-status">Cada jogador precisa encontrar uma palavra com as duas letras juntas.</div><div class="wb-help">Comece pelo celular quando todos estiverem prontos.</div>';else if (state.phase === 'playing') main.innerHTML = '<div class="wb-caption">Vez de ' + word_ui_escape(active.nick || 'Jogador') + '</div><div class="wb-pair">' + state.pair.toUpperCase() + '</div><div class="wb-status">' + word_ui_escape(state.message || 'Encontre uma palavra antes da bomba explodir.') + '</div><div class="wb-help">As letras precisam aparecer juntas, nessa ordem.</div>';else main.innerHTML = '<div class="wb-caption">A bomba parou</div><div class="wb-pair">★</div><div class="wb-status">' + (state.winnerId ? word_ui_escape(playerName(state, state.winnerId)) + ' venceu!' : 'Partida encerrada.') + '</div><div class="wb-help">Uma nova partida pode ser iniciada pelo celular.</div>';
+    if (state.phase === 'lobby') main.innerHTML = '<div class="wb-caption">Desafio de palavras</div><div class="wb-pair">? ?</div><div class="wb-status">Cada jogador precisa encontrar uma palavra com as duas letras juntas.</div><div class="wb-help">Comece pelo celular quando todos estiverem prontos.</div>';else if (state.phase === 'playing') main.innerHTML = '<div class="wb-caption">' + (state.acceptedWord ? word_ui_escape(active.nick || 'Jogador') + ' acertou!' : 'Vez de ' + word_ui_escape(active.nick || 'Jogador')) + '</div><div class="wb-pair">' + state.pair.toUpperCase() + '</div><div class="wb-word' + (state.acceptedWord ? ' correct' : state.typedWord ? '' : ' empty') + '">' + word_ui_escape(state.acceptedWord || state.typedWord || 'Aguardando o jogador digitar…') + '</div><div class="wb-status">' + word_ui_escape(state.message || 'Encontre uma palavra antes da bomba explodir.') + '</div><div class="wb-help">' + (state.acceptedWord ? 'Palavra aceita!' : 'As letras precisam aparecer juntas, nessa ordem.') + '</div>';else main.innerHTML = '<div class="wb-caption">A bomba parou</div><div class="wb-pair">★</div><div class="wb-status">' + (state.winnerId ? word_ui_escape(playerName(state, state.winnerId)) + ' venceu!' : 'Partida encerrada.') + '</div><div class="wb-help">Uma nova partida pode ser iniciada pelo celular.</div>';
     var bomb = wrap.querySelector('.wb-bomb');
-    bomb.style.display = state.phase === 'playing' ? 'block' : 'none';
-    bomb.innerHTML = state.phase === 'playing' ? '<div class="wb-seconds">' + state.secondsLeft + '</div>' : '';
+    bomb.style.display = state.phase === 'playing' && !state.acceptedWord ? 'block' : 'none';
+    bomb.innerHTML = state.phase === 'playing' && !state.acceptedWord ? '<div class="wb-seconds">' + state.secondsLeft + '</div>' : '';
     roster.innerHTML = '';
     (state.players || []).forEach(function (player) {
       var lives = state.lives[player.playerId] || 0,
@@ -3284,7 +3284,7 @@ function mountHand(root, onAction) {
     }
     var myTurn = state.players[state.turnIndex].playerId === playerId;
     if (!myTurn) {
-      wrap.innerHTML = '<h1>Acompanhe a mesa</h1><div class="pair">' + state.pair.toUpperCase() + '</div><p>É a vez de ' + word_ui_escape(state.players[state.turnIndex].nick || 'outro jogador') + '.</p><div class="wb-lives">' + lifeMarkup(myLives) + '</div><p class="timer">' + state.secondsLeft + 's</p>';
+      wrap.innerHTML = '<h1>Acompanhe a mesa</h1><div class="pair">' + state.pair.toUpperCase() + '</div><p>É a vez de ' + word_ui_escape(state.players[state.turnIndex].nick || 'outro jogador') + '.</p><div class="wb-lives">' + lifeMarkup(myLives) + '</div><p class="timer">' + timerText(state) + '</p>';
       return;
     }
     if (myLives === 0) {
@@ -3293,16 +3293,17 @@ function mountHand(root, onAction) {
     }
     renderInput(wrap, state, onAction, myLives, draft, function (value) {
       draft = value;
-      inputLocked = value !== '';
     }, function () {
       inputLocked = false;
-    }, function () {
-      inputLocked = true;
     });
+    // The player owns this screen for the whole turn. The clock is updated in
+    // place above, so an eventual duplicate state delivery cannot recreate the
+    // input and erase a word that is being typed.
+    inputLocked = true;
   };
 }
-function renderInput(wrap, state, onAction, lives, draft, onDraft, onSend, onFocus) {
-  wrap.innerHTML = '<p>É a sua vez!</p><div class="pair">' + state.pair.toUpperCase() + '</div><p class="timer">' + state.secondsLeft + 's</p><div class="wb-lives">' + lifeMarkup(lives) + '</div><input class="wb-input" maxlength="18" autocomplete="off" autocapitalize="none" placeholder="Digite uma palavra"><button class="wb-button">Enviar palavra</button><p class="wb-note">' + word_ui_escape(state.message || '') + '</p>';
+function renderInput(wrap, state, onAction, lives, draft, onDraft, onSend) {
+  wrap.innerHTML = '<p>É a sua vez!</p><div class="pair">' + state.pair.toUpperCase() + '</div><p class="timer">' + timerText(state) + '</p><div class="wb-lives">' + lifeMarkup(lives) + '</div><input class="wb-input" maxlength="18" autocomplete="off" autocapitalize="none" placeholder="Digite uma palavra"><button class="wb-button">Enviar palavra</button><p class="wb-note">' + word_ui_escape(state.message || '') + '</p>';
   var input = wrap.querySelector('input'),
     button = wrap.querySelector('button');
   input.value = draft;
@@ -3320,8 +3321,11 @@ function renderInput(wrap, state, onAction, lives, draft, onDraft, onSend, onFoc
   button.onclick = send;
   input.oninput = function () {
     onDraft(input.value);
+    onAction({
+      type: 'typing',
+      word: input.value
+    });
   };
-  input.onfocus = onFocus;
   input.onkeydown = function (event) {
     if (event.key === 'Enter') send();
   };
@@ -3344,6 +3348,9 @@ function findPlayer(state, id) {
 function playerName(state, id) {
   var player = findPlayer(state, id);
   return player ? player.nick || 'Jogador' : 'Ninguém';
+}
+function timerText(state) {
+  return state.secondsLeft === null || state.secondsLeft === undefined ? '' : state.secondsLeft + 's';
 }
 function secondsLeft(deadline) {
   return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
@@ -3389,6 +3396,9 @@ function action(message) {
   });
   if (message.type === 'restart' && state.phase === 'finished') sendToTable({
     restart: true
+  });
+  if (message.type === 'typing' && state.phase === 'playing' && state.players[state.turnIndex].playerId === playerId) sendToTable({
+    typing: message.word
   });
   if (message.type === 'word' && state.phase === 'playing' && state.players[state.turnIndex].playerId === playerId) sendToTable({
     word: message.word

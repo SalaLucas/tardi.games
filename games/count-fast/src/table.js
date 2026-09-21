@@ -1,4 +1,4 @@
-import { startMatch, sendToAllHands } from '@tardi/sdk/table'
+import { startMatch, sendToAllHands } from '@juxhouse/tardi-core/table'
 import { mountTable } from './shared/attention-ui.js'
 
 var ITEMS = ['🍋', '🍓', '🍇', '🍒', '⭐', '💎', '🎈', '🟣']

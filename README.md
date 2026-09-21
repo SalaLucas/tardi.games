@@ -18,12 +18,12 @@ Tardi makes it easy for the Table and Hand parts of your game to send messages t
 
 ## Creating a Game
 
-#### 1) Fork this repo
+#### 1) Create your repository
 
-[Fork this repo](https://github.com/juxhouse/tardi.games/fork) to your account.
+Create a public repository named `{your-account}/tardi.games` from the [Tardi GDK template](https://github.com/juxhouse/tardi.games-gdk).
 
 > [!IMPORTANT]
-> Do not rename the repo. It must be called `{your-account}/tardi.games`.
+> The repository must be public and named `{your-account}/tardi.games`.
 
 Clone it locally.
 
@@ -46,9 +46,9 @@ To play it in dev mode:
 Dev mode will open your game Table with 2 Hands already connected.
 
 
-#### 4) Play with your friends
+#### 4) Release and play
 
-The Tardi platform will automatically detect changes and deploy the games in the `main` branch of your `tardi.games` repo. This takes a couple of minutes.
+Commit and push your changes to `main`. The GitHub Actions workflow builds all games and creates a release containing their game files. The Tardi platform detects the release and deploys it within a couple of minutes.
 
 When choosing a game to play on https://tardi.games you can search for your github account and/or game name.
 
