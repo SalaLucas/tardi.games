@@ -11,6 +11,6 @@
     "@juxhouse/tardi-core": "0.1.2"
   },
   "devDependencies": {
-    "@juxhouse/tardi-build": "0.1.3"
+    "@juxhouse/tardi-build": "0.1.7"
   }
 }

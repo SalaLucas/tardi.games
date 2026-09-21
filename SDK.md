@@ -9,8 +9,11 @@ assets/thumbnail.png    # 512x512 pixels.
 src/                    # Your game source files go here.
   table.js              # Your Table entry point (required)
   hand.js               # Your Hand  entry point (required)
-hand.js                 # Generated on build time.
-table.js                # Generated on build time.
+dist/                   # Generated on build time.
+  hand.js
+  table.js
+  game.json
+  assets/thumbnail.png
 ```
 
 #### Running in Dev Mode
@@ -23,10 +26,12 @@ Run `npm run build`
 
 It will read the sources and convert them to old Javascript, compatible with most old TV Browsers.
 
-The files required by Tardi will be generated:
+The publishable game will be generated in `dist/`:
 ```
-hand.js
-table.js
+dist/hand.js
+dist/table.js
+dist/game.json
+dist/assets/thumbnail.png
 ```
 Commit the game sources to your `main` branch and push to GitHub. The repository workflow builds every game and creates a GitHub release. Tardi detects releases from public repositories named `tardi.games` and deploys them on https://tardi.games.
 
@@ -62,8 +67,8 @@ Your game Table and Hand will run in their own iframe and must be 100% responsiv
 JavaScript — `import`, classes, arrow functions — and put any rules or UI that
 both sides need in `src/shared/`.
 
-`npm run build` bundles each entry into a single `hand.js` / `table.js` that
-runs on old TV browsers. You write modern code; the build makes it compatible.
+`npm run build` bundles each entry into `dist/hand.js` / `dist/table.js` that
+run on old TV browsers. You write modern code; the build makes it compatible.
 
 Import the SDK from your entry points (no globals are injected):
 
