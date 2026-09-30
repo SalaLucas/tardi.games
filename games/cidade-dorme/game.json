@@ -1,0 +1,9 @@
+{
+  "title": "Cidade Dorme",
+  "description": "Descubra os assassinos antes que a cidade inteira adormeça.",
+  "sharedScreen": "required",
+  "players": {
+    "min": 5,
+    "max": 8
+  }
+}

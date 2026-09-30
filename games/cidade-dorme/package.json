@@ -1,0 +1,18 @@
+{
+  "name": "tardi-game-cidade-dorme",
+  "version": "1.0.0",
+  "description": "Um jogo brasileiro de dedução social para jogar com celulares e uma mesa compartilhada.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tardi-build",
+    "dev": "tardi-build dev",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@juxhouse/tardi-core": "0.1.3"
+  },
+  "devDependencies": {
+    "@juxhouse/tardi-build": "0.1.8"
+  }
+}
