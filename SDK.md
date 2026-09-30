@@ -42,6 +42,7 @@ Commit the game sources to your `main` branch and push to GitHub. The repository
 {
   "title": "My Special Game",
   "description": "A game of mystery and adventure for many players.",
+  "sharedScreen": "required",
   "players": {
     "min": 2,
     "max": 8
